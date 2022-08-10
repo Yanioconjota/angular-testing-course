@@ -34,7 +34,7 @@ describe('CoursesService', () => {
         expect(course.titles.description).toBe('Angular Testing Course');
       });
 
-      //To test our http request we should expect that only one method was called and the url hitting it will be the one actually used by the real method
+      //To test our http request we should expect that only one method was called and the url hitting it will be the one actually used by the real method (mock http request)
       const req = httpTestingController.expectOne('/api/courses');
 
       //Testing our http request we should expect that only one method was called and to be GET
@@ -49,5 +49,26 @@ describe('CoursesService', () => {
           Object.values(COURSES)
       });
   });
+
+  it('should find a coursse by id', () => {
+    const id = 12;
+    coursesService.findCourseById(id)
+      .subscribe(course => {
+
+        expect(course).toBeTruthy('No course found');
+        expect(course.id).toBe(id);
+      });
+      const req = httpTestingController.expectOne(`/api/courses/${id}`);
+      expect(req.request.method).toEqual('GET');
+
+      console.log(COURSES[id]);
+      req.flush(COURSES[id]);
+  });
+
+  afterEach(() => {
+    //Verify that no other request are made.
+    httpTestingController.verify()
+  });
+
 
 });
