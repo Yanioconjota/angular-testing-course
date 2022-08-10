@@ -2,6 +2,7 @@ import { TestBed } from "@angular/core/testing";
 import { CoursesService } from "./courses.service";
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { COURSES } from "../../../../server/db-data";
+import { Course } from "../model/course";
 
 describe('CoursesService', () => {
 
@@ -64,6 +65,33 @@ describe('CoursesService', () => {
       console.log(COURSES[id]);
       req.flush(COURSES[id]);
   });
+
+  it('should save the course data', () => {
+
+    const id = 12;
+
+    const changes: Partial<Course> = {
+      titles: {
+        description: 'Testing course'
+      }
+    }
+
+    coursesService.saveCourse(id, changes).subscribe(course => {
+      //we check that we change the same course which Id we passed on
+      expect(course.id).toBe(id);
+    });
+    const req = httpTestingController.expectOne(`/api/courses/${id}`);
+    expect(req.request.method).toEqual('PUT');
+
+    expect(req.request.body.titles.description).toEqual(changes.titles.description);
+
+    //to match the mock request with original data, we use the spread operator to get the original object and we uset again to change only the required data to match
+    req.flush({
+      ...COURSES[id],
+      ...changes
+    });
+  });
+
 
   afterEach(() => {
     //Verify that no other request are made.
