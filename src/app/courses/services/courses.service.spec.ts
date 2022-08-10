@@ -1,7 +1,7 @@
 import { TestBed } from "@angular/core/testing";
 import { CoursesService } from "./courses.service";
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { COURSES } from "../../../../server/db-data";
+import { COURSES, findLessonsForCourse } from "../../../../server/db-data";
 import { Course } from "../model/course";
 import { HttpErrorResponse } from "@angular/common/http";
 
@@ -124,6 +124,33 @@ describe('CoursesService', () => {
     //Verify that no other request are made.
     httpTestingController.verify()
   });
+
+  it('should find a list of lessons', () => {
+    const id = 12;
+
+    coursesService.findLessons(id)
+      .subscribe(lessons => {
+        expect(lessons).toBeTruthy();
+        expect(lessons.length).toBe(3);
+      });
+
+      //since we have multiple url params we can just match the url
+      const req = httpTestingController.expectOne(req => req.url == '/api/lessons');
+
+      expect(req.request.method).toEqual('GET');
+      //every param must be type string
+      expect(req.request.params.get('courseId')).toBe('12');
+      expect(req.request.params.get('filter')).toBe('');
+      expect(req.request.params.get('sortOrder')).toBe('asc');
+      expect(req.request.params.get('pageNumber')).toBe('0');
+      expect(req.request.params.get('pageSize')).toBe('3');
+
+      //we use the helper function findLessonsForCourse and pass the lesson id and slice the first 3 elements to match the pageSize param
+      req.flush({
+        payload: findLessonsForCourse(12).slice(0,3)
+      })
+  });
+
 
 
 });
