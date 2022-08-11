@@ -19,7 +19,7 @@ describe('CoursesService', () => {
           CoursesService,
         ]
       });
-
+      //mock injection of our service to access its methods
       coursesService = TestBed.inject(CoursesService);
       httpTestingController = TestBed.inject(HttpTestingController);
     });
