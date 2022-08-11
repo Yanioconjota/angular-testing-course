@@ -63,7 +63,7 @@ describe('CoursesService', () => {
       const req = httpTestingController.expectOne(`/api/courses/${id}`);
       expect(req.request.method).toEqual('GET');
 
-      console.log(COURSES[id]);
+      //console.log(COURSES[id]);
       req.flush(COURSES[id]);
   });
 
