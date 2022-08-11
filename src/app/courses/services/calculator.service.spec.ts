@@ -9,7 +9,7 @@ describe('Calculator service', () => {
 
   beforeEach(() => {
     //1- Setup phase: prepare the component or service to test
-    console.log('Calling before each');
+    ////console.log('Calling before each');
     //Fake dependency injection using spy
     //The first param is the name of the implementation and the second one is an array of methods
     loggerSpy = jasmine.createSpyObj('LoggerService', ['log']);
@@ -30,7 +30,7 @@ describe('Calculator service', () => {
 
 
   it('should add two numbers', () => {
-    console.log('Calling add test');
+    //console.log('Calling add test');
     //2- Execution: Triggers the operation to test
     const result = calculator.add(2,2);
     //3 - assertions: Checks if the executions is succesful
@@ -39,7 +39,7 @@ describe('Calculator service', () => {
   });
 
   it('should subtract two numbers', () => {
-   console.log('Calling subtract test');
+   //console.log('Calling subtract test');
     const result = calculator.subtract(2,2);
     //We can pass a second argument as an expectation fail output
     expect(result).toBe(0, 'Unexpexted subtraction result');
