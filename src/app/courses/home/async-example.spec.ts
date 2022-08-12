@@ -1,4 +1,6 @@
-import { fakeAsync, flush, tick } from "@angular/core/testing";
+import { fakeAsync, flush, flushMicrotasks, tick } from "@angular/core/testing";
+import { of } from "rxjs";
+import { delay } from 'rxjs/operators';
 
 fdescribe('Async testing example', () => {
 
@@ -59,9 +61,101 @@ fdescribe('Async testing example', () => {
 
   }));
 
-  /* fit('Asynchrous test example - plain promise', () => {
+  it('Asynchrous test example - plain promise', fakeAsync(() => {
 
-  }); */
+    //In this example we have 2 different types of queues operations, microtasks such as Promise, and macrotasks or tasks like setTimeout, setInterval, click... microtasks are executed first and then when the microtasks queue is empty the macrotask queue is executed
+
+    //console.log('creating promise');
+
+    /* setTimeout(() => console.log('first setTimeout() callback triggered'));
+
+    setTimeout(() => console.log('second setTimeout() callback triggered')); */
+
+    Promise.resolve().then(() => {
+      //console.log('promise first then() evaluated successfully');
+
+      return Promise.resolve();
+    }).then(() => {
+
+      //console.log('promise second then() evaluated successfully');
+
+      test = true;
+    });
+
+    //Flush any pending microtasks.
+    flushMicrotasks();
+
+    //console.log('running plain promise assertions');
+
+    expect(test).toBeTruthy();
+
+  }));
+
+  it('Asynchrous test example - Promises + setTimeout()', fakeAsync(() => {
+
+    let counter = 0;
+
+    Promise.resolve()
+      .then(() => {
+
+        counter += 10;
+
+        setTimeout(() => {
+
+          counter += 1;
+
+        }, timeout);
+
+      });
+
+    //console.log(counter);//0
+    expect(counter).toBe(0);
+    flushMicrotasks();
+    //console.log(counter);//10
+    expect(counter).toBe(10);
+    tick(500);
+    //console.log(counter);//10
+    expect(counter).toBe(10);
+    tick(500);
+    //console.log(counter);//11
+    expect(counter).toBe(11);
+  }));
+
+  it('Asynchrous test example - Observable', () => {
+
+    //console.log('creating a new Observable');
+
+    //setting test flag into an Observable
+    const test$ = of(test);
+
+    //By creating an observable we make sure that the following code is executed inmediatly, right before the assertion
+    test$.subscribe(() => {
+      test = true;
+    });
+
+    //console.log('running Observable assertions');
+    expect(test).toBe(true);
+
+  });
+
+  fit('Asynchrous test example - Asynchronous Observable', fakeAsync(() => {
+
+    console.log('creating a new Observable');
+
+    //setting test flag into an Observable
+    const test$ = of(test).pipe(delay(timeout));
+
+    //By creating an observable we make sure that the following code is executed inmediatly, right before the assertion
+    test$.subscribe(() => {
+      test = true;
+    });
+
+    tick(timeout);
+    console.log('running Observable assertions');
+    expect(test).toBe(true);
+
+  }));
+
 
 
 });
